@@ -27,7 +27,7 @@ const translations = {
     songVersionInstrumental: 'Instrumental Versions',
     addToQueue: 'Add to Queue',
     viewQueue: 'View Queue',
-    pauseMusicOnTabHidden: 'Pause music when tab is hidden'
+    pauseMusicText: 'Pause music when exiting tab'
   },
   'es-ES': {
     settingsTitle: 'Configuración',
@@ -57,7 +57,7 @@ const translations = {
     songVersionInstrumental: 'Versiones Instrumentales',
     addToQueue: 'Agregar a Cola',
     viewQueue: 'Ver Cola',
-    pauseMusicOnTabHidden: 'Pausar música cuando la pestaña está oculta'
+    pauseMusicText: 'Pausar música al salir de la pestaña'
   },
   'fr-FR': {
     settingsTitle: 'Paramètres',
@@ -87,7 +87,7 @@ const translations = {
     songVersionInstrumental: 'Versions Instrumentales',
     addToQueue: 'Ajouter à la file',
     viewQueue: 'Voir la file',
-    pauseMusicOnTabHidden: 'Mettre en pause la musique quand l\'onglet est masqué'
+    pauseMusicText: 'Mettre en pause la musique en quittant l\'onglet'
   },
   'de-DE': {
     settingsTitle: 'Einstellungen',
@@ -117,7 +117,7 @@ const translations = {
     songVersionInstrumental: 'Instrumentale Versionen',
     addToQueue: 'Zur Warteschlange hinzufügen',
     viewQueue: 'Warteschlange anzeigen',
-    pauseMusicOnTabHidden: 'Musik pausieren, wenn der Tab ausgeblendet ist'
+    pauseMusicText: 'Musik beim Verlassen des Tabs pausieren'
   },
   'ja-JP': {
     settingsTitle: '設定',
@@ -147,7 +147,7 @@ const translations = {
     songVersionInstrumental: 'インストゥルメンタルバージョン',
     addToQueue: 'キューに追加',
     viewQueue: 'キューを表示',
-    pauseMusicOnTabHidden: 'タブが非表示のときに音楽を一時停止'
+    pauseMusicText: 'タブを終了するときに音楽を一時停止'
   },
   'zh-CN': {
     settingsTitle: '设置',
@@ -177,6 +177,6 @@ const translations = {
     songVersionInstrumental: '器乐版本',
     addToQueue: '添加到队列',
     viewQueue: '查看队列',
-    pauseMusicOnTabHidden: '标签页隐藏时暂停音乐'
+    pauseMusicText: '退出标签页时暂停音乐'
   }
 };

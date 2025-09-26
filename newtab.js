@@ -375,11 +375,12 @@ function updatePageText(lang) {
     viewQueueBtn.textContent = t.viewQueue;
   }
 
-  // Pause music option
+  // Pause music text
   const pauseMusicText = document.getElementById('pauseMusicText');
   if (pauseMusicText) {
-    pauseMusicText.textContent = t.pauseMusicOnTabHidden;
+    pauseMusicText.textContent = t.pauseMusicText;
   }
+
 
   // Logo
   const logoElement = document.querySelector('.search-logo');
