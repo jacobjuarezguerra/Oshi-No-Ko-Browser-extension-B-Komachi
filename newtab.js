@@ -579,7 +579,9 @@ window.addEventListener('load', () => {
     document.querySelector('.search-container'),
     document.getElementById('settingsBtn'),
     document.getElementById('currentImage'),
-    document.querySelector('.footer')
+    document.querySelector('.footer'),
+    document.querySelector('.search-logo'),
+    ...document.querySelectorAll('.star-decoration')
   ];
 
   uiToggleBtn.addEventListener('click', (e) => {
@@ -593,6 +595,14 @@ window.addEventListener('load', () => {
     const icon = document.getElementById('uiToggleIcon');
     if (icon) {
       icon.src = uiHidden ? `${GITHUB_BASE_URL}eyecrossed.svg` : `${GITHUB_BASE_URL}eye.svg`;
+    }
+    // Hide button background when UI is hidden
+    if (uiHidden) {
+      uiToggleBtn.style.background = 'none';
+      uiToggleBtn.style.boxShadow = 'none';
+    } else {
+      uiToggleBtn.style.background = 'linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #ff1493 100%)';
+      uiToggleBtn.style.boxShadow = '0 4px 15px rgba(255, 107, 157, 0.4)';
     }
   });
 
