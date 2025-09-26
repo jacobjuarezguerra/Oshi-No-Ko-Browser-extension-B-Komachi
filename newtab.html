@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Tab</title>
-    
+
+    <link rel="icon" href="favicon.png">
+
     <!-- Ensure proper symbol/emoji rendering -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    
+
     <!-- Font imports for better symbol support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -476,6 +478,8 @@
       color: white;
       font-weight: 500;
       resize: none;
+      overflow-y: hidden;
+      overflow-x: hidden;
     }
 
     .search-input::-webkit-scrollbar {
@@ -894,7 +898,7 @@
     </div>
   </div>
   
-  <div class="current-image" id="currentImage">Current: Ruby - Cheerful Explorer</div>
+  <div class="current-image" id="currentImage"></div>
   
   <!-- Footer -->
   <footer class="footer">

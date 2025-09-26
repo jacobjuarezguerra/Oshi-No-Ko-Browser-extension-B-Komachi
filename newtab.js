@@ -674,6 +674,17 @@ window.addEventListener('load', () => {
       } else {
         searchSuggestions.style.display = 'none';
       }
+
+      // Toggle scrollbar based on content overflow
+      setTimeout(() => {
+        if (query.length === 0) {
+          searchInput.style.overflowY = 'hidden';
+        } else if (searchInput.scrollHeight > searchInput.clientHeight) {
+          searchInput.style.overflowY = 'auto';
+        } else {
+          searchInput.style.overflowY = 'hidden';
+        }
+      }, 0);
     });
   }
   
