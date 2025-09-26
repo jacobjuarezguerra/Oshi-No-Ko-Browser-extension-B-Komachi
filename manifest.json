@@ -4,14 +4,14 @@
   "version": "1.0",
   "description": "Beautiful rotating wallpapers for your new tab, Featuring B-Komachi!",
   "icons": {
-    "16": "icon.svg",
-    "32": "icon.svg",
-    "48": "icon.svg",
-    "128": "icon.svg"
+    "16": "BKomachiLogo.svg",
+    "32": "BKomachiLogo.svg",
+    "48": "BKomachiLogo.svg",
+    "128": "BKomachiLogo.svg"
   },
   "action": {
     "default_popup": "hello.html",
-    "default_icon": "favicon.png"
+    "default_icon": "BKomachiLogo.svg"
   },
   "chrome_url_overrides": {
     "newtab": "newtab.html"
