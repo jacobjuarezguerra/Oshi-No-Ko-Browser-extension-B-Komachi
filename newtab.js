@@ -269,17 +269,31 @@ style.textContent = `
 
 // Initialize extension
 async function init() {
-  // Always use local content
-  images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
-  // Set audio sources to local
-  songInfo.forEach((song, index) => {
-    const audioEl = document.getElementById(`song${index + 1}`);
-    if (audioEl) {
-      audioEl.src = song.file;
-      audioEl.load();
-    }
-  });
-  showNotification('📱 Using local content');
+  const isOnline = await checkConnectivity();
+  if (isOnline) {
+    images = Array.from({length: 19}, (_, i) => GITHUB_BASE_URL + `bg${i + 1}.jpg`);
+    songInfo.forEach((song, index) => {
+      const audioEl = document.getElementById(`song${index + 1}`);
+      if (audioEl) {
+        audioEl.src = GITHUB_BASE_URL + song.file;
+        audioEl.load();
+      }
+    });
+    showNotification('🌐 Using online content');
+    document.getElementById('connectionStatus').style.display = 'none';
+  } else {
+    images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
+    songInfo.forEach((song, index) => {
+      const audioEl = document.getElementById(`song${index + 1}`);
+      if (audioEl) {
+        audioEl.src = song.file;
+        audioEl.load();
+      }
+    });
+    showNotification('📱 Using local content');
+    document.getElementById('connectionStatus').textContent = 'Offline Mode';
+    document.getElementById('connectionStatus').style.display = 'block';
+  }
 
   // Load saved index
   chrome.storage.local.get(['currentIndex'], (result) => {
@@ -291,9 +305,23 @@ async function init() {
     }
 
     // Preload all background images
-    images.forEach(imgSrc => {
+    images.forEach((imgSrc, index) => {
       const img = new Image();
       img.src = imgSrc;
+      if (imgSrc.startsWith(GITHUB_BASE_URL)) {
+        img.onerror = () => {
+          // If GitHub image fails, switch to local
+          const localSrc = imgSrc.replace(GITHUB_BASE_URL, '');
+          images[index] = localSrc;
+          // If current image is this one, update it
+          if (currentIndex === index) {
+            const activeLayer = document.getElementById(`backgroundLayer${currentLayer}`);
+            if (activeLayer) {
+              activeLayer.style.backgroundImage = `url(${localSrc})`;
+            }
+          }
+        };
+      }
     });
 
     // Set initial background on the active layer
@@ -620,6 +648,7 @@ window.addEventListener('load', () => {
     document.getElementById('currentImage'),
     document.querySelector('.footer'),
     document.querySelector('.search-logo'),
+    document.getElementById('connectionStatus'),
     ...document.querySelectorAll('.star-decoration')
   ];
 
