@@ -269,31 +269,17 @@ style.textContent = `
 
 // Initialize extension
 async function init() {
-  // Check connectivity and set sources
-  const isOnline = await checkConnectivity();
-  if (isOnline) {
-    images = Array.from({length: 19}, (_, i) => `${GITHUB_BASE_URL}bg${i + 1}.jpg`);
-    // Set audio sources to remote
-    songInfo.forEach((song, index) => {
-      const audioEl = document.getElementById(`song${index + 1}`);
-      if (audioEl) {
-        audioEl.src = `${GITHUB_BASE_URL}${song.file}`;
-        audioEl.load();
-      }
-    });
-    showNotification('🔗 Online mode - Loading remote content');
-  } else {
-    images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
-    // Set audio sources to local
-    songInfo.forEach((song, index) => {
-      const audioEl = document.getElementById(`song${index + 1}`);
-      if (audioEl) {
-        audioEl.src = song.file;
-        audioEl.load();
-      }
-    });
-    showNotification('📱 Offline mode - Using local content');
-  }
+  // Always use local content
+  images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
+  // Set audio sources to local
+  songInfo.forEach((song, index) => {
+    const audioEl = document.getElementById(`song${index + 1}`);
+    if (audioEl) {
+      audioEl.src = song.file;
+      audioEl.load();
+    }
+  });
+  showNotification('📱 Using local content');
 
   // Load saved index
   chrome.storage.local.get(['currentIndex'], (result) => {
@@ -1026,40 +1012,6 @@ window.addEventListener('load', () => {
     rotationInterval = setInterval(changeBackgroundSequential, currentSpeed * 1000);
   });
   
-  // Function to switch sources based on connectivity
-  async function switchSources() {
-    const isOnline = await checkConnectivity();
-    if (isOnline) {
-      images = Array.from({length: 19}, (_, i) => `${GITHUB_BASE_URL}bg${i + 1}.jpg`);
-      songInfo.forEach((song, index) => {
-        const audioEl = document.getElementById(`song${index + 1}`);
-        if (audioEl) {
-          audioEl.src = `${GITHUB_BASE_URL}${song.file}`;
-          audioEl.load();
-        }
-      });
-      showNotification('🔗 Switched to online mode - Loading remote content');
-    } else {
-      images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
-      songInfo.forEach((song, index) => {
-        const audioEl = document.getElementById(`song${index + 1}`);
-        if (audioEl) {
-          audioEl.src = song.file;
-          audioEl.load();
-        }
-      });
-      showNotification('📱 Switched to offline mode - Using local content');
-    }
-    // Update current background if needed
-    const activeLayer = document.getElementById(`backgroundLayer${currentLayer}`);
-    if (activeLayer) {
-      activeLayer.style.backgroundImage = `url(${images[currentIndex]})`;
-    }
-  }
-
-  // Listen for connectivity changes
-  window.addEventListener('online', switchSources);
-  window.addEventListener('offline', switchSources);
 
   // Initialize the extension
   console.log('About to call init()');
