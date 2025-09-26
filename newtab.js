@@ -3,11 +3,7 @@ const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/Osh
 
 // Check internet connectivity
 function checkConnectivity() {
-  if (!navigator.onLine) return Promise.resolve(false);
-  return Promise.race([
-    fetch(GITHUB_BASE_URL + 'favicon.png', { method: 'HEAD' }).then(response => response.ok).catch(() => false),
-    new Promise(resolve => setTimeout(() => resolve(false), 3000))
-  ]);
+  return navigator.onLine;
 }
 
 // Generate array of 19 background images with character names
