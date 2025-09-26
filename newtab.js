@@ -1,5 +1,5 @@
 // GitHub raw base URL
-const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/Oshi-No-Ko-Browser-extension-B-Komachi/main/';
+const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/';
 
 // Check internet connectivity
 function checkConnectivity() {

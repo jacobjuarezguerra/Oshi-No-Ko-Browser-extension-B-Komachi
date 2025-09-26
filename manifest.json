@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Oshi no Ko Wallpapers",
+  "name": "OshiNoKoExtensionBKomachi",
   "version": "1.0",
-  "description": "Beautiful rotating Oshi no Ko wallpapers for your new tab, Featuring B-Komachi!",
+  "description": "Beautiful rotating wallpapers for your new tab, Featuring B-Komachi!",
   "icons": {
     "16": "icon.svg",
     "32": "icon.svg",
