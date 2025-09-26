@@ -1,5 +1,8 @@
+// GitHub raw base URL
+const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/Oshi-No-Ko-Browser-extension-B-Komachi/main/';
+
 // Generate array of 19 background images with character names
-const images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
+const images = Array.from({length: 19}, (_, i) => `${GITHUB_BASE_URL}bg${i + 1}.jpg`);
 
 // Character/scene descriptions for each image
 const imageNames = [
@@ -228,7 +231,7 @@ function createSparkleEffect() {
       sparkle.style.top = Math.random() * 100 + 'vh';
       sparkle.style.width = Math.random() * 40 + 20 + 'px';
       sparkle.style.height = sparkle.style.width;
-      sparkle.style.backgroundImage = 'url(StarPink.svg)';
+      sparkle.style.backgroundImage = `url(${GITHUB_BASE_URL}StarPink.svg)`;
       sparkle.style.backgroundSize = 'contain';
       sparkle.style.backgroundRepeat = 'no-repeat';
       sparkle.style.backgroundPosition = 'center';
@@ -351,10 +354,20 @@ function updatePageText(lang) {
     songVersionSelect.options[2].textContent = `🎼 ${t.songVersionInstrumental}`;
   }
 
+  // Queue buttons
+  const addToQueueBtn = document.getElementById('addToQueueBtn');
+  if (addToQueueBtn) {
+    addToQueueBtn.textContent = t.addToQueue;
+  }
+  const viewQueueBtn = document.getElementById('viewQueueBtn');
+  if (viewQueueBtn) {
+    viewQueueBtn.textContent = t.viewQueue;
+  }
+
   // Logo
   const logoElement = document.querySelector('.search-logo');
   if (logoElement) {
-    logoElement.style.backgroundImage = lang === 'ja-JP' ? 'url("logojp.png")' : 'url("logo.png")';
+    logoElement.style.backgroundImage = lang === 'ja-JP' ? `url(${GITHUB_BASE_URL}logojp.png)` : `url(${GITHUB_BASE_URL}logo.png)`;
   }
 
   // Update current image display
@@ -579,7 +592,7 @@ window.addEventListener('load', () => {
     });
     const icon = document.getElementById('uiToggleIcon');
     if (icon) {
-      icon.src = uiHidden ? 'eyecrossed.svg' : 'eye.svg';
+      icon.src = uiHidden ? `${GITHUB_BASE_URL}eyecrossed.svg` : `${GITHUB_BASE_URL}eye.svg`;
     }
   });
 
@@ -803,6 +816,11 @@ window.addEventListener('load', () => {
         // If no song playing and queue exists, play first in queue
         const nextSong = songQueue.shift();
         currentSongIndex = songInfo.findIndex(s => s.file === nextSong.file);
+        // Update queue display if visible
+        const queueDiv = document.getElementById('queueDisplay');
+        if (queueDiv && queueDiv.style.display !== 'none') {
+          updateQueueDisplay();
+        }
       }
       playCurrentSong();
     }
@@ -812,6 +830,11 @@ window.addEventListener('load', () => {
     if (songQueue.length > 0) {
       const nextSong = songQueue.shift();
       currentSongIndex = songInfo.findIndex(s => s.file === nextSong.file);
+      // Update queue display if visible
+      const queueDiv = document.getElementById('queueDisplay');
+      if (queueDiv && queueDiv.style.display !== 'none') {
+        updateQueueDisplay();
+      }
     } else {
       currentSongIndex = (currentSongIndex + 1) % songInfo.length;
     }
@@ -829,7 +852,7 @@ window.addEventListener('load', () => {
     // Update speaker icon
     const speakerIcon = document.getElementById('speakerIcon');
     if (speakerIcon) {
-      speakerIcon.src = volume === 0 ? 'Speakermuted.svg' : 'Speaker.svg';
+      speakerIcon.src = volume === 0 ? `${GITHUB_BASE_URL}Speakermuted.svg` : `${GITHUB_BASE_URL}Speaker.svg`;
     }
   });
 
@@ -874,6 +897,11 @@ window.addEventListener('load', () => {
         if (!songQueue.some(song => song.file === songInfo[selectedIndex].file)) {
           songQueue.push(songInfo[selectedIndex]);
           showNotification('Added to queue: ' + songInfo[selectedIndex].name);
+          // Update queue display if visible
+          const queueDiv = document.getElementById('queueDisplay');
+          if (queueDiv && queueDiv.style.display !== 'none') {
+            updateQueueDisplay();
+          }
         } else {
           showNotification('Song already in queue');
         }
@@ -903,6 +931,11 @@ window.addEventListener('load', () => {
           if (songQueue.length > 0) {
             const nextSong = songQueue.shift();
             currentSongIndex = songInfo.findIndex(s => s.file === nextSong.file);
+            // Update queue display if visible
+            const queueDiv = document.getElementById('queueDisplay');
+            if (queueDiv && queueDiv.style.display !== 'none') {
+              updateQueueDisplay();
+            }
           } else {
             currentSongIndex = (currentSongIndex + 1) % songInfo.length;
           }

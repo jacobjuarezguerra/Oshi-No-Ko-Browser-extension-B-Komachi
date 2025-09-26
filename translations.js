@@ -24,7 +24,9 @@ const translations = {
     pageLanguage: 'Page Language:',
     songVersionPiano: 'Piano Versions',
     songVersionNormal: 'Normal Versions',
-    songVersionInstrumental: 'Instrumental Versions'
+    songVersionInstrumental: 'Instrumental Versions',
+    addToQueue: 'Add to Queue',
+    viewQueue: 'View Queue'
   },
   'es-ES': {
     settingsTitle: 'Configuración',
@@ -51,7 +53,9 @@ const translations = {
     pageLanguage: 'Idioma de la Página:',
     songVersionPiano: 'Versiones de Piano',
     songVersionNormal: 'Versiones Normales',
-    songVersionInstrumental: 'Versiones Instrumentales'
+    songVersionInstrumental: 'Versiones Instrumentales',
+    addToQueue: 'Agregar a Cola',
+    viewQueue: 'Ver Cola'
   },
   'fr-FR': {
     settingsTitle: 'Paramètres',
@@ -78,7 +82,9 @@ const translations = {
     pageLanguage: 'Langue de la page:',
     songVersionPiano: 'Versions Piano',
     songVersionNormal: 'Versions Normales',
-    songVersionInstrumental: 'Versions Instrumentales'
+    songVersionInstrumental: 'Versions Instrumentales',
+    addToQueue: 'Ajouter à la file',
+    viewQueue: 'Voir la file'
   },
   'de-DE': {
     settingsTitle: 'Einstellungen',
@@ -105,7 +111,9 @@ const translations = {
     pageLanguage: 'Seitensprache:',
     songVersionPiano: 'Piano-Versionen',
     songVersionNormal: 'Normale Versionen',
-    songVersionInstrumental: 'Instrumentale Versionen'
+    songVersionInstrumental: 'Instrumentale Versionen',
+    addToQueue: 'Zur Warteschlange hinzufügen',
+    viewQueue: 'Warteschlange anzeigen'
   },
   'ja-JP': {
     settingsTitle: '設定',
@@ -132,7 +140,9 @@ const translations = {
     pageLanguage: 'ページ言語:',
     songVersionPiano: 'ピアノバージョン',
     songVersionNormal: '通常バージョン',
-    songVersionInstrumental: 'インストゥルメンタルバージョン'
+    songVersionInstrumental: 'インストゥルメンタルバージョン',
+    addToQueue: 'キューに追加',
+    viewQueue: 'キューを表示'
   },
   'zh-CN': {
     settingsTitle: '设置',
@@ -159,6 +169,8 @@ const translations = {
     pageLanguage: '页面语言:',
     songVersionPiano: '钢琴版本',
     songVersionNormal: '普通版本',
-    songVersionInstrumental: '器乐版本'
+    songVersionInstrumental: '器乐版本',
+    addToQueue: '添加到队列',
+    viewQueue: '查看队列'
   }
 };
