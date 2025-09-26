@@ -36,6 +36,7 @@ let currentSongIndex = 0; // Index in queue
 let currentSpeed = 5; // Current rotation speed in seconds
 let lastVolume = 50; // Store last volume before mute
 let uiHidden = false; // UI visibility state
+let pauseMusicOnTabHidden = true; // Pause music when tab hidden
 
 // Notification function
 function showNotification(message) {
@@ -290,7 +291,7 @@ function init() {
   });
   
   // Load saved settings
-  chrome.storage.sync.get({rotationSpeed: 5, pageLang: 'en-US', voiceLang: 'en-US'}, (result) => {
+  chrome.storage.sync.get({rotationSpeed: 5, pageLang: 'en-US', voiceLang: 'en-US', pauseMusicOnTabHidden: true}, (result) => {
     if (chrome.runtime.lastError) {
       console.error('Storage error:', chrome.runtime.lastError);
       return;
@@ -303,6 +304,8 @@ function init() {
 
     pageLang.value = result.pageLang;
     voiceLang.value = result.voiceLang;
+    pauseMusicOnTabHidden = result.pauseMusicOnTabHidden;
+    document.getElementById('pauseMusicOnTabHidden').checked = pauseMusicOnTabHidden;
 
     // Update page text
     updatePageText(result.pageLang);
@@ -314,6 +317,14 @@ function init() {
     pageLang.addEventListener('change', () => {
       updatePageText(pageLang.value);
     });
+  
+    // Listen for pause music toggle
+    const pauseMusicCheckbox = document.getElementById('pauseMusicOnTabHidden');
+    if (pauseMusicCheckbox) {
+      pauseMusicCheckbox.addEventListener('change', () => {
+        pauseMusicOnTabHidden = pauseMusicCheckbox.checked;
+      });
+    }
   });
 }
 
@@ -362,6 +373,12 @@ function updatePageText(lang) {
   const viewQueueBtn = document.getElementById('viewQueueBtn');
   if (viewQueueBtn) {
     viewQueueBtn.textContent = t.viewQueue;
+  }
+
+  // Pause music option
+  const pauseMusicText = document.getElementById('pauseMusicText');
+  if (pauseMusicText) {
+    pauseMusicText.textContent = t.pauseMusicOnTabHidden;
   }
 
   // Logo
@@ -444,13 +461,14 @@ window.addEventListener('load', () => {
     const speed = parseInt(rotationSpeedSlider.value);
     const pageLanguage = pageLang.value;
     const voiceLanguage = voiceLang.value;
+    const pauseMusic = document.getElementById('pauseMusicOnTabHidden').checked;
 
     if (speed < 1 || speed > 60) {
       alert('⚠️ Speed must be between 1 and 60 seconds!');
       return;
     }
 
-    chrome.storage.sync.set({rotationSpeed: speed, pageLang: pageLanguage, voiceLang: voiceLanguage}, () => {
+    chrome.storage.sync.set({rotationSpeed: speed, pageLang: pageLanguage, voiceLang: voiceLanguage, pauseMusicOnTabHidden: pauseMusic}, () => {
       if (chrome.runtime.lastError) {
         console.error('Storage error:', chrome.runtime.lastError);
         alert('❌ Failed to save settings. Please try again.');
@@ -461,6 +479,7 @@ window.addEventListener('load', () => {
       updatePageText(pageLanguage);
 
       currentSpeed = speed;
+      pauseMusicOnTabHidden = pauseMusic;
       // Restart rotation with new speed
       clearInterval(rotationInterval);
       rotationInterval = setInterval(changeBackgroundSequential, speed * 1000);
@@ -977,4 +996,12 @@ window.addEventListener('load', () => {
   console.log('About to call init()');
   init();
   console.log('Init() completed');
+
+  // Pause music when tab is hidden
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && currentSong && !currentSong.paused && pauseMusicOnTabHidden) {
+      currentSong.pause();
+      playPauseBtn.textContent = '▶';
+    }
+  });
 });

@@ -1,24 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Tab</title>
-  
-  <!-- Ensure proper symbol/emoji rendering -->
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  
-  <!-- Font imports for better symbol support -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Segoe+UI:wght@400;500;700&display=swap" rel="stylesheet">
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    
+    <!-- Ensure proper symbol/emoji rendering -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    <!-- Font imports for better symbol support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Segoe+UI:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      width: 100vw;
-      background-size: cover;
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        width: 100vw;
+        background-size: cover;
       background-position: center;
       background-attachment: fixed;
       background-repeat: no-repeat;
@@ -85,20 +85,40 @@
     
     .settings-panel {
       position: fixed;
-      top: 80px;
+      top: 120px;
       right: 20px;
+      bottom: 60px;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 245, 0.95) 100%);
       backdrop-filter: blur(15px);
       border-radius: 16px;
-      padding: 25px;
+      padding: 25px 35px 25px 25px;
       box-shadow: 0 8px 32px rgba(255, 107, 157, 0.3);
       width: 320px;
+      overflow-y: auto;
       z-index: 1000;
       display: none;
       color: #333;
       transform-origin: top right;
       animation: slideIn 0.3s ease-out;
       border: 2px solid rgba(255, 107, 157, 0.2);
+    }
+
+    .settings-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .settings-panel::-webkit-scrollbar-track {
+      background: transparent;
+      margin: 10px 0;
+    }
+
+    .settings-panel::-webkit-scrollbar-thumb {
+      background: #ff6b9d;
+      border-radius: 3px;
+    }
+
+    .settings-panel::-webkit-scrollbar-thumb:hover {
+      background: #c44569;
     }
     
     @keyframes slideIn {
@@ -430,6 +450,10 @@
       box-shadow: 0 8px 32px rgba(255, 107, 157, 0.2);
       overflow: hidden;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
     }
     
     .search-box:hover {
@@ -443,14 +467,33 @@
     }
     
     .search-input {
-      width: 100%;
-      padding: 18px 25px 18px 60px;
+      flex: 1;
+      padding: 18px 10px 18px 0;
       font-size: 16px;
       background: transparent;
       border: none;
       outline: none;
       color: white;
       font-weight: 500;
+      resize: none;
+    }
+
+    .search-input::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .search-input::-webkit-scrollbar-track {
+      background: transparent;
+      margin: 10px 0;
+    }
+
+    .search-input::-webkit-scrollbar-thumb {
+      background: #ff6b9d;
+      border-radius: 3px;
+    }
+
+    .search-input::-webkit-scrollbar-thumb:hover {
+      background: #c44569;
     }
     
     .search-input::placeholder {
@@ -458,10 +501,6 @@
     }
     
     .search-button {
-      position: absolute;
-      left: 8px;
-      top: 50%;
-      transform: translateY(-50%);
       width: 44px;
       height: 44px;
       background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
@@ -473,21 +512,18 @@
       justify-content: center;
       transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+      flex-shrink: 0;
     }
     
     .search-button:hover {
-      transform: translateY(-50%) scale(1.1);
       box-shadow: 0 6px 16px rgba(255, 107, 157, 0.5);
     }
-    
+
     .search-button:active {
-      transform: translateY(-50%) scale(0.95);
+      transform: scale(0.95);
     }
 
     .mic-button, .camera-button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
       width: 36px;
       height: 36px;
       background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
@@ -500,15 +536,15 @@
       transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
       font-size: 16px;
+      flex-shrink: 0;
     }
 
     .mic-button:hover, .camera-button:hover {
-      transform: translateY(-50%) scale(1.1);
       box-shadow: 0 6px 16px rgba(255, 107, 157, 0.5);
     }
 
     .mic-button:active, .camera-button:active {
-      transform: translateY(-50%) scale(0.95);
+      transform: scale(0.95);
     }
 
     .mic-button {
@@ -725,21 +761,21 @@
   <!-- Search Container -->
   <div class="search-container">
     <div class="search-box" id="searchBox">
-      <input type="text" class="search-input" id="searchInput" placeholder="Search the web with B-Komachi...">
       <button class="search-button" id="searchButton">
         <svg class="search-icon" viewBox="0 0 24 24">
           <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
         </svg>
+      </button>
+      <textarea class="search-input" id="searchInput" placeholder="Search the web with B-Komachi..." rows="1" style="resize: none;"></textarea>
+      <button class="camera-button" id="cameraButton" title="Image Search">
+        <img src="https://raw.githubusercontent.com/jacobjuarezguerra/Oshi-No-Ko-Browser-extension-B-Komachi/main/Camera.svg" alt="" style="width: 16px; height: 16px;">
+        <div class="button-star"></div>
       </button>
       <button class="mic-button" id="micButton" title="Voice Search">
         <svg class="mic-icon" viewBox="0 0 24 24">
           <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
         </svg>
         <img src="https://raw.githubusercontent.com/jacobjuarezguerra/Oshi-No-Ko-Browser-extension-B-Komachi/main/star_white.svg" class="button-star" alt="">
-      </button>
-      <button class="camera-button" id="cameraButton" title="Image Search">
-        <img src="https://raw.githubusercontent.com/jacobjuarezguerra/Oshi-No-Ko-Browser-extension-B-Komachi/main/Camera.svg" alt="" style="width: 16px; height: 16px;">
-        <div class="button-star"></div>
       </button>
       <div class="search-suggestions" id="searchSuggestions">
         <div class="search-suggestion" data-query="Oshi no Ko season 2">Oshi no Ko season 2</div>
@@ -814,6 +850,12 @@
     <div class="language-control">
       <label for="voiceLang">Voice Language:</label>
       <select id="voiceLang"></select>
+    </div>
+    <div class="music-control">
+      <label for="pauseMusicOnTabHidden" style="display: flex; align-items: center;">
+        <input type="checkbox" id="pauseMusicOnTabHidden" style="margin-right: 10px;">
+        <span id="pauseMusicText">Pause music when exiting tab</span>
+      </label>
     </div>
     <div class="music-controls" id="musicControls">
       <div style="display: flex; align-items: center; justify-content: space-between;">
