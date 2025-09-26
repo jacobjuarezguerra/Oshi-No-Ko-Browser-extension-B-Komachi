@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Oshi no Ko Wallpapers",
+  "version": "1.0",
+  "description": "Beautiful rotating Oshi no Ko wallpapers for your new tab, Featuring B-Komachi!",
+  "icons": {
+    "16": "icon.svg",
+    "32": "icon.svg",
+    "48": "icon.svg",
+    "128": "icon.svg"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "*.svg",
+        "*.png",
+        "*.jpg",
+        "*.mp3"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://postimages.org/"
+  }
+}

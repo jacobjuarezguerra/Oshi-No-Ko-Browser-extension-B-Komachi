@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Tab</title>
+  
+  <!-- Ensure proper symbol/emoji rendering -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  
+  <!-- Font imports for better symbol support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Segoe+UI:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      width: 100vw;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-color: #1a1a2e;
+      font-family: 'Segoe UI', 'Noto Color Emoji', system-ui, -apple-system, sans-serif;
+      color: white;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .background-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      z-index: -2;
+    }
+    
+    .background-layer.active {
+      opacity: 1;
+    }
+    
+    .settings-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .settings-btn:hover {
+      transform: scale(1.1) rotate(15deg);
+      box-shadow: 0 6px 20px rgba(255, 107, 157, 0.6);
+    }
+    
+    .settings-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .settings-icon {
+      font-size: 24px;
+      color: white;
+    }
+
+    .settings-icon::before {
+      content: "⚙";
+    }
+    
+    .settings-panel {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 245, 0.95) 100%);
+      backdrop-filter: blur(15px);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(255, 107, 157, 0.3);
+      width: 320px;
+      z-index: 1000;
+      display: none;
+      color: #333;
+      transform-origin: top right;
+      animation: slideIn 0.3s ease-out;
+      border: 2px solid rgba(255, 107, 157, 0.2);
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .settings-panel h3 {
+      margin-top: 0;
+      color: #cc5580;
+      font-weight: bold;
+      font-size: 18px;
+      font-family: cursive;
+      border-bottom: 2px solid #ff6b9d;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .settings-panel h3::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      background-image: url('StarPink.svg');
+      background-size: 100% 100%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .settings-panel h3::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      background-image: url('StarPink.svg');
+      background-size: 100% 100%;
+      display: inline-block;
+      margin-left: 8px;
+    }
+    
+    .btn-primary::before {
+      content: "";
+      width: 14px;
+      height: 14px;
+      background-image: url('StarWhite.svg');
+      background-size: 100% 100%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    
+    .speed-control {
+      margin-bottom: 20px;
+    }
+    
+    .speed-control label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 500;
+      color: #cc5580;
+      font-size: 16px;
+      font-family: cursive;
+    }
+    
+    .speed-control input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #ff6b9d, #c44569);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    .speed-control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(255, 107, 157, 0.4);
+    }
+
+    .language-control {
+      margin-bottom: 20px;
+    }
+
+    .language-control label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 500;
+      color: #cc5580;
+      font-size: 16px;
+      font-family: cursive;
+    }
+
+    .language-control select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid rgba(255, 107, 157, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 182, 193, 0.3) url('StarPink.svg') no-repeat 10% 20%, url('StarPink.svg') no-repeat 70% 60%, url('StarPink.svg') no-repeat 40% 80%, url('StarPink.svg') no-repeat 90% 30%;
+      background-size: 12px 12px;
+      color: #333;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .language-control select:focus {
+      border-color: #ff6b9d;
+    }
+    
+    .speed-value {
+      display: inline-block;
+      margin-left: 10px;
+      font-weight: 600;
+      color: #cc5580;
+      min-width: 40px;
+      font-size: 12px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(255, 107, 157, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 107, 157, 0.5);
+    }
+    
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #4a5568;
+      border: 2px solid #ff6b9d;
+    }
+    
+    .btn-secondary:hover {
+      background: #ff6b9d;
+      color: white;
+    }
+    
+    .current-image {
+      position: fixed;
+      bottom: 120px;
+      left: 20px;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(196, 69, 105, 0.8) 100%);
+      backdrop-filter: blur(10px);
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255, 107, 157, 0.3);
+      max-width: 300px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+    
+    .current-song {
+      position: fixed;
+      bottom: 80px;
+      left: 20px;
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(255, 107, 157, 0.8) 100%);
+      backdrop-filter: blur(10px);
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255, 107, 157, 0.3);
+      max-width: 300px;
+      display: none;
+    }
+    
+    .current-song.playing {
+      display: block;
+    }
+    
+    .song-controls {
+      display: flex;
+      gap: 8px;
+      margin-left: 10px;
+    }
+    
+    .song-control-btn {
+      background: rgba(255, 107, 157, 0.2);
+      border: 1px solid rgba(255, 107, 157, 0.4);
+      border-radius: 15px;
+      padding: 4px 8px;
+      font-size: 10px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .song-control-btn:hover {
+      background: rgba(255, 107, 157, 0.4);
+      transform: scale(1.05);
+    }
+    
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(196, 69, 105, 0.85) 100%);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255, 107, 157, 0.3);
+      padding: 12px 20px;
+      z-index: 999;
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-width: 1200px;
+      margin: 0 auto;
+      font-size: 12px;
+    }
+    
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .footer-link {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-link:hover {
+      color: #ff6b9d;
+    }
+    
+    .footer-star {
+      width: 12px;
+      height: 12px;
+      background: #ff6b9d;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      display: inline-block;
+    }
+    
+    .footer-separator {
+      color: rgba(255, 107, 157, 0.5);
+    }
+    
+    .search-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 600px;
+      z-index: 500;
+    }
+    
+    .search-box {
+      position: relative;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 107, 157, 0.1) 100%);
+      backdrop-filter: blur(20px);
+      border-radius: 50px;
+      border: 2px solid rgba(255, 107, 157, 0.3);
+      box-shadow: 0 8px 32px rgba(255, 107, 157, 0.2);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .search-box:hover {
+      border-color: rgba(255, 107, 157, 0.6);
+      box-shadow: 0 12px 40px rgba(255, 107, 157, 0.3);
+    }
+    
+    .search-box.focused {
+      border-color: #ff6b9d;
+      box-shadow: 0 12px 40px rgba(255, 107, 157, 0.4);
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 18px 25px 18px 60px;
+      font-size: 16px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-weight: 500;
+    }
+    
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .search-button {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+    }
+    
+    .search-button:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 6px 16px rgba(255, 107, 157, 0.5);
+    }
+    
+    .search-button:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    .mic-button, .camera-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+      font-size: 16px;
+    }
+
+    .mic-button:hover, .camera-button:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 6px 16px rgba(255, 107, 157, 0.5);
+    }
+
+    .mic-button:active, .camera-button:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    .mic-button {
+      right: 20px;
+    }
+
+    .mic-button.listening {
+      background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+      animation: pulse 1s infinite;
+    }
+
+    .camera-button {
+      right: 64px;
+    }
+
+    .decorative-camera {
+      position: absolute;
+      top: 50%;
+      right: 108px;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+    }
+
+    @keyframes pulse {
+      0% { transform: translateY(-50%) scale(1); }
+      50% { transform: translateY(-50%) scale(1.1); }
+      100% { transform: translateY(-50%) scale(1); }
+    }
+
+    .search-icon {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+
+    .mic-icon, .camera-icon {
+      width: 16px;
+      height: 16px;
+      fill: white;
+    }
+
+    .button-star {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 8px;
+      height: 8px;
+    }
+    
+    .search-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(196, 69, 105, 0.95) 100%);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      margin-top: 8px;
+      border: 1px solid rgba(255, 107, 157, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      display: none;
+    }
+    
+    .search-suggestion {
+      padding: 12px 20px;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 1px solid rgba(255, 107, 157, 0.1);
+    }
+    
+    .search-suggestion:last-child {
+      border-bottom: none;
+    }
+    
+    .search-suggestion:hover {
+      background: rgba(255, 107, 157, 0.2);
+      color: white;
+    }
+    
+    .search-logo {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 40px;
+      background-image: url('logo.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      z-index: 400;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+    
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+      }
+      
+      .current-image {
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: calc(100vw - 40px);
+        text-align: center;
+      }
+    }
+    
+    .music-controls {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 107, 157, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 107, 157, 0.2);
+    }
+    
+    .music-button {
+      background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      margin: 2px;
+      transition: all 0.3s ease;
+    }
+    
+    .music-button:hover {
+      transform: scale(1.05);
+    }
+    
+    .music-button.active {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    }
+    
+    .volume-control {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .volume-slider {
+      width: 80px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ff6b9d;
+      cursor: pointer;
+    }
+
+    .speaker-icon {
+      width: 12px;
+      height: 12px;
+      background: #ff6b9d;
+      clip-path: polygon(0% 20%, 60% 20%, 60% 0%, 100% 0%, 100% 100%, 60% 100%, 60% 80%, 0% 80%);
+      display: inline-block;
+    }
+
+    .css-camera-icon {
+      width: 16px;
+      height: 16px;
+      background: white;
+      clip-path: polygon(0% 25%, 75% 25%, 75% 0%, 100% 0%, 100% 100%, 75% 100%, 75% 75%, 0% 75%);
+      display: inline-block;
+    }
+    
+    .star-decoration {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+      width: 14px;
+      height: 14px;
+      opacity: 0.6;
+      animation: twinkle 2s infinite;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background layers for smooth transitions -->
+  <div class="background-layer active" id="backgroundLayer1"></div>
+  <div class="background-layer" id="backgroundLayer2"></div>
+  
+  <!-- Search Logo -->
+  <div class="search-logo" id="searchLogo"></div>
+  
+  <!-- Search Container -->
+  <div class="search-container">
+    <div class="search-box" id="searchBox">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search the web with B-Komachi...">
+      <button class="search-button" id="searchButton">
+        <svg class="search-icon" viewBox="0 0 24 24">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+      </button>
+      <button class="mic-button" id="micButton" title="Voice Search">
+        <svg class="mic-icon" viewBox="0 0 24 24">
+          <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+        </svg>
+        <img src="star_white.svg" class="button-star" alt="">
+      </button>
+      <button class="camera-button" id="cameraButton" title="Image Search">
+        <img src="Camera.svg" alt="" style="width: 16px; height: 16px;">
+        <div class="button-star"></div>
+      </button>
+      <div class="search-suggestions" id="searchSuggestions">
+        <div class="search-suggestion" data-query="Oshi no Ko season 2">Oshi no Ko season 2</div>
+        <div class="search-suggestion" data-query="B-Komachi songs">B-Komachi songs</div>
+        <div class="search-suggestion" data-query="Ai Hoshino">Ai Hoshino</div>
+        <div class="search-suggestion" data-query="Ruby Hoshino">Ruby Hoshino</div>
+        <div class="search-suggestion" data-query="Aqua Hoshino">Aqua Hoshino</div>
+      </div>
+    </div>
+  </div>
+
+
+  
+  <button class="settings-btn" id="settingsBtn" aria-label="Wallpaper Settings">
+    <img src="gear.svg" alt="" style="width: 24px; height: 24px;">
+  </button>
+
+  <!-- UI Toggle Button -->
+  <button id="uiToggleBtn" style="position: fixed; top: 20px; left: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4); transition: all 0.3s ease; z-index: 1000;">
+    <img id="uiToggleIcon" src="eye.svg" alt="" style="width: 24px; height: 24px;">
+  </button>
+
+  <!-- Notification box -->
+  <div id="notification" style="position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(196, 69, 105, 0.85) 100%); color: white; padding: 10px 15px; border-radius: 8px; display: none; z-index: 10000; font-size: 14px; backdrop-filter: blur(10px);"></div>
+
+  <!-- Audio Elements -->
+  <audio id="song1"  preload="auto">
+    <source src="Song1.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song2"  preload="auto">
+    <source src="song2.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song3"  preload="auto">
+    <source src="song3.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song4"  preload="auto">
+    <source src="song4.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song5"  preload="auto">
+    <source src="song5.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song6"  preload="auto">
+    <source src="song6.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song7"  preload="auto">
+    <source src="song7.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song8"  preload="auto">
+    <source src="song8.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song9"  preload="auto">
+    <source src="song9.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song10"  preload="auto">
+    <source src="song10.mp3" type="audio/mpeg">
+  </audio>
+  
+  
+  <div class="settings-panel" id="settingsPanel">
+    <h3>Oshi no Ko Wallpapers</h3>
+    <div class="speed-control">
+      <label for="rotationSpeed">
+        Rotation Speed:
+        <span class="speed-value" id="speedValue">5s</span>
+      </label>
+      <input type="range" id="rotationSpeed" min="1" max="60" value="5">
+    </div>
+    <div class="language-control">
+      <label for="pageLang">Page Language:</label>
+      <select id="pageLang"></select>
+    </div>
+    <div class="language-control">
+      <label for="voiceLang">Voice Language:</label>
+      <select id="voiceLang"></select>
+    </div>
+    <div class="music-controls" id="musicControls">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <button class="music-button" id="prevBtn">⏮</button>
+          <button class="music-button" id="playPauseBtn">▶</button>
+          <button class="music-button" id="nextBtn">⏭</button>
+        </div>
+        <div id="currentSongInline" style="flex: 1; text-align: center; font-family: 'Segoe UI', cursive; font-size: 14px; color: #cc5580; font-weight: 500;"></div>
+      </div>
+      <div class="volume-control">
+        <img id="speakerIcon" src="Speaker.svg" alt="" style="width: 12px; height: 12px; cursor: pointer;">
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+      </div>
+    </div>
+    <div class="song-selector" style="margin-top: 10px;">
+      <label for="songSelect" style="font-size: 12px; color: #cc5580;">Select Song:</label>
+      <select id="songSelect" style="margin-left: 10px; padding: 5px; border: 2px solid rgba(255, 107, 157, 0.3); border-radius: 8px; background: rgba(255, 255, 255, 0.9); color: #333; font-size: 12px;">
+        <!-- Options will be populated by JS -->
+      </select>
+      <button id="addToQueueBtn" style="margin-left: 10px; padding: 5px 10px; background: #ff6b9d; color: white; border: none; border-radius: 5px; cursor: pointer;">Add to Queue</button>
+      <button id="viewQueueBtn" style="margin-left: 10px; padding: 5px 10px; background: #ff6b9d; color: white; border: none; border-radius: 5px; cursor: pointer;">View Queue</button>
+    </div>
+    <div id="queueDisplay" style="display: none; margin-top: 10px; color: #333;"></div>
+    <div class="version-control" style="margin-top: 10px;">
+      <label for="songVersion" style="font-size: 12px; color: #cc5580;">Song Version:</label>
+      <select id="songVersion" style="margin-left: 10px; padding: 5px; border: 2px solid rgba(255, 107, 157, 0.3); border-radius: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 107, 157, 0.1) 100%); color: #333; font-size: 12px;">
+        <option value="piano">⭐ Piano Versions</option>
+        <option value="normal">🎵 Normal Versions</option>
+        <option value="instrumental">🎼 Instrumental Versions</option>
+      </select>
+    </div>
+    <div class="button-group">
+      <button class="btn btn-primary" id="saveSettings">Save Settings</button>
+      <button class="btn btn-secondary" id="closeSettings">Close</button>
+    </div>
+  </div>
+  
+  <div class="current-image" id="currentImage">Current: Ruby - Cheerful Explorer</div>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <img src="StarPink.svg" alt="" style="width: 24px; height: 24px; display: inline-block; vertical-align: middle;">
+        <span>© 2024 B-Komachi Productions. All rights reserved.</span>
+      </div>
+      <div class="footer-right">
+        <a href="#" class="footer-link" id="nextWallpaper">Next Wallpaper</a>
+        <span class="footer-separator">|</span>
+        <a href="#" class="footer-link" id="randomWallpaper">Random</a>
+        <span class="footer-separator">|</span>
+        <a href="https://myanimelist.net/anime/52034/Oshi_no_Ko" class="footer-link" target="_blank">Watch Oshi no Ko</a>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Star decorations -->
+  <img src="StarPink.svg" class="star-decoration" style="top: 10%; left: 15%;" alt="">
+  <img src="StarPink.svg" class="star-decoration" style="top: 25%; right: 25%;" alt="">
+  <img src="StarPink.svg" class="star-decoration" style="bottom: 30%; left: 10%;" alt="">
+  <img src="StarPink.svg" class="star-decoration" style="bottom: 15%; right: 15%;" alt="">
+  <img src="StarPink.svg" class="star-decoration" style="top: 40%; left: 45%;" alt="">
+
+  <script src="languages.js"></script>
+  <script src="translations.js"></script>
+  <script src="newtab.js"></script>
+</body>
+</html>
