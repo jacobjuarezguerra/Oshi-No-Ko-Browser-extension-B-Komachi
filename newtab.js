@@ -1,5 +1,5 @@
 // GitHub raw base URL
-const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/';
+const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/Oshi-No-Ko-Browser-extension-B-Komachi/main/';
 
 // Check internet connectivity
 function checkConnectivity() {
@@ -44,6 +44,7 @@ let currentSpeed = 5; // Current rotation speed in seconds
 let lastVolume = 50; // Store last volume before mute
 let uiHidden = false; // UI visibility state
 let pauseMusicOnTabHidden = true; // Pause music when tab hidden
+let isOnline = false; // Online status
 
 // Notification function
 function showNotification(message) {
@@ -269,7 +270,7 @@ style.textContent = `
 
 // Initialize extension
 async function init() {
-  const isOnline = await checkConnectivity();
+  isOnline = await checkConnectivity();
   if (isOnline) {
     images = Array.from({length: 19}, (_, i) => GITHUB_BASE_URL + `bg${i + 1}.jpg`);
     songInfo.forEach((song, index) => {
@@ -281,6 +282,31 @@ async function init() {
     });
     showNotification('🌐 Using online content');
     document.getElementById('connectionStatus').style.display = 'none';
+
+    // Set dynamic CSS for online resources
+    const dynamicCSS = `
+      .search-logo { background-image: url(${GITHUB_BASE_URL}logo.png) !important; }
+      .star-decoration { background-image: url(${GITHUB_BASE_URL}StarPink.svg) !important; }
+      .settings-panel h3::before, .settings-panel h3::after { background-image: url(${GITHUB_BASE_URL}StarPink.svg) !important; }
+      .btn-primary::before { background-image: url(${GITHUB_BASE_URL}StarWhite.svg) !important; }
+      .language-control select {
+        background: rgba(255, 182, 193, 0.3) url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 10% 20%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 70% 60%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 40% 80%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 90% 30% !important;
+        background-size: 12px 12px !important;
+      }
+      .language-control select:focus {
+        background: rgba(255, 182, 193, 0.5) url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 10% 20%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 70% 60%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 40% 80%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 90% 30% !important;
+        background-size: 12px 12px !important;
+      }
+    `;
+    document.getElementById('dynamicStyles').textContent = dynamicCSS;
+
+    // Update img src to GitHub
+    document.querySelectorAll('img').forEach(img => {
+      const src = img.getAttribute('src');
+      if (src && !src.startsWith('http') && !src.startsWith('data:')) {
+        img.src = GITHUB_BASE_URL + src;
+      }
+    });
   } else {
     images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
     songInfo.forEach((song, index) => {
@@ -432,7 +458,8 @@ function updatePageText(lang) {
   // Logo
   const logoElement = document.querySelector('.search-logo');
   if (logoElement) {
-    logoElement.style.backgroundImage = lang === 'ja-JP' ? `url(logojp.png)` : `url(logo.png)`;
+    const logoUrl = lang === 'ja-JP' ? 'logojp.png' : 'logo.png';
+    logoElement.style.backgroundImage = `url(${isOnline ? GITHUB_BASE_URL + logoUrl : logoUrl})`;
   }
 
   // Update current image display
@@ -662,7 +689,8 @@ window.addEventListener('load', () => {
     });
     const icon = document.getElementById('uiToggleIcon');
     if (icon) {
-      icon.src = uiHidden ? `eyecrossed.svg` : `eye.svg`;
+      const base = isOnline ? GITHUB_BASE_URL : '';
+      icon.src = base + (uiHidden ? `eyecrossed.svg` : `eye.svg`);
     }
     // Hide button background when UI is hidden
     if (uiHidden) {
