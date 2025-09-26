@@ -1,8 +1,15 @@
 // GitHub raw base URL
 const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/Oshi-No-Ko-Browser-extension-B-Komachi/main/';
 
+// Check internet connectivity
+function checkConnectivity() {
+  return navigator.onLine && fetch(GITHUB_BASE_URL + 'favicon.png', { method: 'HEAD', mode: 'no-cors' })
+    .then(() => true)
+    .catch(() => false);
+}
+
 // Generate array of 19 background images with character names
-const images = Array.from({length: 19}, (_, i) => `${GITHUB_BASE_URL}bg${i + 1}.jpg`);
+let images;
 
 // Character/scene descriptions for each image
 const imageNames = [
@@ -232,16 +239,16 @@ function createSparkleEffect() {
       sparkle.style.top = Math.random() * 100 + 'vh';
       sparkle.style.width = Math.random() * 40 + 20 + 'px';
       sparkle.style.height = sparkle.style.width;
-      sparkle.style.backgroundImage = `url(${GITHUB_BASE_URL}StarPink.svg)`;
+      sparkle.style.backgroundImage = `url(StarPink.svg)`;
       sparkle.style.backgroundSize = 'contain';
       sparkle.style.backgroundRepeat = 'no-repeat';
       sparkle.style.backgroundPosition = 'center';
       sparkle.style.pointerEvents = 'none';
       sparkle.style.zIndex = '500';
       sparkle.style.animation = 'fadeOut 2s ease-out forwards';
-      
+
       document.body.appendChild(sparkle);
-      
+
       setTimeout(() => {
         if (sparkle.parentNode) {
           sparkle.parentNode.removeChild(sparkle);
@@ -261,7 +268,33 @@ style.textContent = `
 `;
 
 // Initialize extension
-function init() {
+async function init() {
+  // Check connectivity and set sources
+  const isOnline = await checkConnectivity();
+  if (isOnline) {
+    images = Array.from({length: 19}, (_, i) => `${GITHUB_BASE_URL}bg${i + 1}.jpg`);
+    // Set audio sources to remote
+    songInfo.forEach((song, index) => {
+      const audioEl = document.getElementById(`song${index + 1}`);
+      if (audioEl) {
+        audioEl.src = `${GITHUB_BASE_URL}${song.file}`;
+        audioEl.load();
+      }
+    });
+    showNotification('🔗 Online mode - Loading remote content');
+  } else {
+    images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
+    // Set audio sources to local
+    songInfo.forEach((song, index) => {
+      const audioEl = document.getElementById(`song${index + 1}`);
+      if (audioEl) {
+        audioEl.src = song.file;
+        audioEl.load();
+      }
+    });
+    showNotification('📱 Offline mode - Using local content');
+  }
+
   // Load saved index
   chrome.storage.local.get(['currentIndex'], (result) => {
     if (chrome.runtime.lastError) {
@@ -385,7 +418,7 @@ function updatePageText(lang) {
   // Logo
   const logoElement = document.querySelector('.search-logo');
   if (logoElement) {
-    logoElement.style.backgroundImage = lang === 'ja-JP' ? `url(${GITHUB_BASE_URL}logojp.png)` : `url(${GITHUB_BASE_URL}logo.png)`;
+    logoElement.style.backgroundImage = lang === 'ja-JP' ? `url(logojp.png)` : `url(logo.png)`;
   }
 
   // Update current image display
@@ -614,7 +647,7 @@ window.addEventListener('load', () => {
     });
     const icon = document.getElementById('uiToggleIcon');
     if (icon) {
-      icon.src = uiHidden ? `${GITHUB_BASE_URL}eyecrossed.svg` : `${GITHUB_BASE_URL}eye.svg`;
+      icon.src = uiHidden ? `eyecrossed.svg` : `eye.svg`;
     }
     // Hide button background when UI is hidden
     if (uiHidden) {
@@ -882,7 +915,7 @@ window.addEventListener('load', () => {
     // Update speaker icon
     const speakerIcon = document.getElementById('speakerIcon');
     if (speakerIcon) {
-      speakerIcon.src = volume === 0 ? `${GITHUB_BASE_URL}Speakermuted.svg` : `${GITHUB_BASE_URL}Speaker.svg`;
+      speakerIcon.src = volume === 0 ? `Speakermuted.svg` : `Speaker.svg`;
     }
   });
 
@@ -993,10 +1026,47 @@ window.addEventListener('load', () => {
     rotationInterval = setInterval(changeBackgroundSequential, currentSpeed * 1000);
   });
   
+  // Function to switch sources based on connectivity
+  async function switchSources() {
+    const isOnline = await checkConnectivity();
+    if (isOnline) {
+      images = Array.from({length: 19}, (_, i) => `${GITHUB_BASE_URL}bg${i + 1}.jpg`);
+      songInfo.forEach((song, index) => {
+        const audioEl = document.getElementById(`song${index + 1}`);
+        if (audioEl) {
+          audioEl.src = `${GITHUB_BASE_URL}${song.file}`;
+          audioEl.load();
+        }
+      });
+      showNotification('🔗 Switched to online mode - Loading remote content');
+    } else {
+      images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
+      songInfo.forEach((song, index) => {
+        const audioEl = document.getElementById(`song${index + 1}`);
+        if (audioEl) {
+          audioEl.src = song.file;
+          audioEl.load();
+        }
+      });
+      showNotification('📱 Switched to offline mode - Using local content');
+    }
+    // Update current background if needed
+    const activeLayer = document.getElementById(`backgroundLayer${currentLayer}`);
+    if (activeLayer) {
+      activeLayer.style.backgroundImage = `url(${images[currentIndex]})`;
+    }
+  }
+
+  // Listen for connectivity changes
+  window.addEventListener('online', switchSources);
+  window.addEventListener('offline', switchSources);
+
   // Initialize the extension
   console.log('About to call init()');
-  init();
-  console.log('Init() completed');
+  (async () => {
+    await init();
+    console.log('Init() completed');
+  })();
 
   // Pause music when tab is hidden
   document.addEventListener('visibilitychange', () => {
