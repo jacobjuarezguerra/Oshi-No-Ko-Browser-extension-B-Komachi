@@ -3,8 +3,8 @@ const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/Osh
 
 // Check internet connectivity
 function checkConnectivity() {
-  return navigator.onLine && fetch(GITHUB_BASE_URL + 'favicon.png', { method: 'HEAD', mode: 'no-cors' })
-    .then(() => true)
+  return navigator.onLine && fetch(GITHUB_BASE_URL + 'favicon.png', { method: 'HEAD' })
+    .then(response => response.ok)
     .catch(() => false);
 }
 
