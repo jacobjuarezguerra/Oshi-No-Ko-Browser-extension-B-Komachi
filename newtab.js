@@ -1,10 +1,4 @@
-// GitHub raw base URL
-const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/Oshi-No-Ko-Browser-extension-B-Komachi/main/';
 
-// Check internet connectivity
-function checkConnectivity() {
-  return navigator.onLine;
-}
 
 // Generate array of 19 background images with character names
 let images;
@@ -42,7 +36,6 @@ let currentSpeed = 5; // Current rotation speed in seconds
 let lastVolume = 50; // Store last volume before mute
 let uiHidden = false; // UI visibility state
 let pauseMusicOnTabHidden = true; // Pause music when tab hidden
-let isOnline = false; // Online status
 
 // Notification function
 function showNotification(message) {
@@ -268,72 +261,15 @@ style.textContent = `
 
 // Initialize extension
 async function init() {
-  isOnline = await checkConnectivity();
-  if (isOnline) {
-    // Load JS files from GitHub
-    try {
-      const langResponse = await fetch(GITHUB_BASE_URL + 'languages.js');
-      if (langResponse.ok) {
-        const langText = await langResponse.text();
-        eval(langText);
-      }
-    } catch (e) {}
-    try {
-      const transResponse = await fetch(GITHUB_BASE_URL + 'translations.js');
-      if (transResponse.ok) {
-        const transText = await transResponse.text();
-        eval(transText);
-      }
-    } catch (e) {}
-
-    images = Array.from({length: 19}, (_, i) => GITHUB_BASE_URL + `bg${i + 1}.jpg`);
-    songInfo.forEach((song, index) => {
-      const audioEl = document.getElementById(`song${index + 1}`);
-      if (audioEl) {
-        audioEl.src = GITHUB_BASE_URL + song.file;
-        audioEl.load();
-      }
-    });
-    showNotification('🌐 Using online content');
-    document.getElementById('connectionStatus').style.display = 'none';
-
-    // Set dynamic CSS for online resources
-    const dynamicCSS = `
-      .search-logo { background-image: url(${GITHUB_BASE_URL}logo.png) !important; }
-      .star-decoration { background-image: url(${GITHUB_BASE_URL}StarPink.svg) !important; }
-      .settings-panel h3::before, .settings-panel h3::after { background-image: url(${GITHUB_BASE_URL}StarPink.svg) !important; }
-      .btn-primary::before { background-image: url(${GITHUB_BASE_URL}StarWhite.svg) !important; }
-      .language-control select {
-        background: rgba(255, 182, 193, 0.3) url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 10% 20%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 70% 60%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 40% 80%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 90% 30% !important;
-        background-size: 12px 12px !important;
-      }
-      .language-control select:focus {
-        background: rgba(255, 182, 193, 0.5) url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 10% 20%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 70% 60%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 40% 80%, url(${GITHUB_BASE_URL}StarPink.svg) no-repeat 90% 30% !important;
-        background-size: 12px 12px !important;
-      }
-    `;
-    document.getElementById('dynamicStyles').textContent = dynamicCSS;
-
-    // Update img src to GitHub
-    document.querySelectorAll('img').forEach(img => {
-      const src = img.getAttribute('src');
-      if (src && !src.startsWith('http') && !src.startsWith('data:')) {
-        img.src = GITHUB_BASE_URL + src;
-      }
-    });
-  } else {
-    images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
-    songInfo.forEach((song, index) => {
-      const audioEl = document.getElementById(`song${index + 1}`);
-      if (audioEl) {
-        audioEl.src = song.file;
-        audioEl.load();
-      }
-    });
-    showNotification('📱 Using local content');
-    document.getElementById('connectionStatus').textContent = 'Offline Mode';
-    document.getElementById('connectionStatus').style.display = 'block';
-  }
+  images = Array.from({length: 19}, (_, i) => `bg${i + 1}.jpg`);
+  songInfo.forEach((song, index) => {
+    const audioEl = document.getElementById(`song${index + 1}`);
+    if (audioEl) {
+      audioEl.src = song.file;
+      audioEl.load();
+    }
+  });
+  showNotification('📱 Using local content');
 
   // Load saved index
   chrome.storage.local.get(['currentIndex'], (result) => {
@@ -344,31 +280,11 @@ async function init() {
       currentIndex = result.currentIndex;
     }
 
-    // Preload background images
-    if (!isOnline) {
-      // Preload all for offline
-      images.forEach(imgSrc => {
-        const img = new Image();
-        img.src = imgSrc;
-      });
-    } else {
-      // For online, preload only current and handle errors
-      images.forEach((imgSrc, index) => {
-        if (index === currentIndex) {
-          const img = new Image();
-          img.src = imgSrc;
-          img.onerror = () => {
-            // If GitHub image fails, switch to local
-            const localSrc = imgSrc.replace(GITHUB_BASE_URL, '');
-            images[index] = localSrc;
-            const activeLayer = document.getElementById(`backgroundLayer${currentLayer}`);
-            if (activeLayer) {
-              activeLayer.style.backgroundImage = `url(${localSrc})`;
-            }
-          };
-        }
-      });
-    }
+    // Preload all background images
+    images.forEach(imgSrc => {
+      const img = new Image();
+      img.src = imgSrc;
+    });
 
     // Set initial background on the active layer
     const activeLayer = document.getElementById(`backgroundLayer${currentLayer}`);
@@ -478,8 +394,7 @@ function updatePageText(lang) {
   // Logo
   const logoElement = document.querySelector('.search-logo');
   if (logoElement) {
-    const logoUrl = lang === 'ja-JP' ? 'logojp.png' : 'logo.png';
-    logoElement.style.backgroundImage = `url(${isOnline ? GITHUB_BASE_URL + logoUrl : logoUrl})`;
+    logoElement.style.backgroundImage = lang === 'ja-JP' ? `url(logojp.png)` : `url(logo.png)`;
   }
 
   // Update current image display
@@ -695,7 +610,6 @@ window.addEventListener('load', () => {
     document.getElementById('currentImage'),
     document.querySelector('.footer'),
     document.querySelector('.search-logo'),
-    document.getElementById('connectionStatus'),
     ...document.querySelectorAll('.star-decoration')
   ];
 
@@ -709,8 +623,7 @@ window.addEventListener('load', () => {
     });
     const icon = document.getElementById('uiToggleIcon');
     if (icon) {
-      const base = isOnline ? GITHUB_BASE_URL : '';
-      icon.src = base + (uiHidden ? `eyecrossed.svg` : `eye.svg`);
+      icon.src = uiHidden ? `eyecrossed.svg` : `eye.svg`;
     }
     // Hide button background when UI is hidden
     if (uiHidden) {
