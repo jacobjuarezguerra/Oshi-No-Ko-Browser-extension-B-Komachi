@@ -3,9 +3,7 @@ const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/jacobjuarezguerra/Osh
 
 // Check internet connectivity
 function checkConnectivity() {
-  return navigator.onLine && fetch(GITHUB_BASE_URL + 'favicon.png', { method: 'HEAD' })
-    .then(response => response.ok)
-    .catch(() => false);
+  return navigator.onLine;
 }
 
 // Generate array of 19 background images with character names
@@ -272,6 +270,22 @@ style.textContent = `
 async function init() {
   isOnline = await checkConnectivity();
   if (isOnline) {
+    // Load JS files from GitHub
+    try {
+      const langResponse = await fetch(GITHUB_BASE_URL + 'languages.js');
+      if (langResponse.ok) {
+        const langText = await langResponse.text();
+        eval(langText);
+      }
+    } catch (e) {}
+    try {
+      const transResponse = await fetch(GITHUB_BASE_URL + 'translations.js');
+      if (transResponse.ok) {
+        const transText = await transResponse.text();
+        eval(transText);
+      }
+    } catch (e) {}
+
     images = Array.from({length: 19}, (_, i) => GITHUB_BASE_URL + `bg${i + 1}.jpg`);
     songInfo.forEach((song, index) => {
       const audioEl = document.getElementById(`song${index + 1}`);
@@ -330,25 +344,31 @@ async function init() {
       currentIndex = result.currentIndex;
     }
 
-    // Preload all background images
-    images.forEach((imgSrc, index) => {
-      const img = new Image();
-      img.src = imgSrc;
-      if (imgSrc.startsWith(GITHUB_BASE_URL)) {
-        img.onerror = () => {
-          // If GitHub image fails, switch to local
-          const localSrc = imgSrc.replace(GITHUB_BASE_URL, '');
-          images[index] = localSrc;
-          // If current image is this one, update it
-          if (currentIndex === index) {
+    // Preload background images
+    if (!isOnline) {
+      // Preload all for offline
+      images.forEach(imgSrc => {
+        const img = new Image();
+        img.src = imgSrc;
+      });
+    } else {
+      // For online, preload only current and handle errors
+      images.forEach((imgSrc, index) => {
+        if (index === currentIndex) {
+          const img = new Image();
+          img.src = imgSrc;
+          img.onerror = () => {
+            // If GitHub image fails, switch to local
+            const localSrc = imgSrc.replace(GITHUB_BASE_URL, '');
+            images[index] = localSrc;
             const activeLayer = document.getElementById(`backgroundLayer${currentLayer}`);
             if (activeLayer) {
               activeLayer.style.backgroundImage = `url(${localSrc})`;
             }
-          }
-        };
-      }
-    });
+          };
+        }
+      });
+    }
 
     // Set initial background on the active layer
     const activeLayer = document.getElementById(`backgroundLayer${currentLayer}`);
