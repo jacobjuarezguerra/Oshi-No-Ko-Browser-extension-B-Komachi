@@ -718,6 +718,22 @@
       cursor: pointer;
     }
 
+    #progressBar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ff6b9d;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(255, 107, 157, 0.3);
+    }
+
+    #progressBar::-webkit-slider-track {
+      background: rgba(255, 107, 157, 0.3);
+      height: 4px;
+      border-radius: 2px;
+    }
+
     .speaker-icon {
       width: 12px;
       height: 12px;
@@ -807,34 +823,40 @@
 
   <!-- Audio Elements -->
   <audio id="song1"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/Song1.mp3" type="audio/mpeg">
+    <source src="Piano/song1P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song2"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song2.mp3" type="audio/mpeg">
+    <source src="Piano/song2P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song3"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song3.mp3" type="audio/mpeg">
+    <source src="Piano/song3P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song4"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song4.mp3" type="audio/mpeg">
+    <source src="Piano/song4P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song5"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song5.mp3" type="audio/mpeg">
+    <source src="Piano/song5P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song6"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song6.mp3" type="audio/mpeg">
+    <source src="Piano/song6P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song7"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song7.mp3" type="audio/mpeg">
+    <source src="Piano/song7P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song8"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song8.mp3" type="audio/mpeg">
+    <source src="Piano/song8P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song9"  preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song9.mp3" type="audio/mpeg">
+    <source src="Piano/song9P.mp3" type="audio/mpeg">
   </audio>
   <audio id="song10" preload="auto">
-    <source src="https://raw.githubusercontent.com/jacobjuarezguerra/OshiNoKoExtensionBKomachi/main/song10.mp3" type="audio/mpeg">
+    <source src="Piano/song10P.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song11" preload="auto">
+    <source src="Piano/song11P.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="song12" preload="auto">
+    <source src="Piano/song12P.mp3" type="audio/mpeg">
   </audio>
   
   
@@ -870,9 +892,15 @@
         </div>
         <div id="currentSongInline" style="flex: 1; text-align: center; font-family: 'Segoe UI', cursive; font-size: 14px; color: #cc5580; font-weight: 500;"></div>
       </div>
+      <div class="progress-control" style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+        <span id="currentTime" style="font-size: 12px; color: #cc5580;">0:00</span>
+        <input type="range" id="progressBar" min="0" max="100" value="0" style="flex: 1; height: 4px; background: rgba(255, 107, 157, 0.3); border-radius: 2px; outline: none; -webkit-appearance: none;">
+        <span id="duration" style="font-size: 12px; color: #cc5580;">0:00</span>
+      </div>
       <div class="volume-control">
         <img id="speakerIcon" src="Speaker.svg" alt="" style="width: 12px; height: 12px; cursor: pointer;">
         <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+        <span id="volumePercent" style="font-size: 12px; color: #cc5580; margin-left: 8px; min-width: 35px;">50%</span>
       </div>
     </div>
     <div class="song-selector" style="margin-top: 10px;">

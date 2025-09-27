@@ -1,12 +1,12 @@
 
 
-// Generate array of 19 background images with character names
+// Generate array of 20 background images with character names
 let images;
 
 // Character/scene descriptions for each image
 const imageNames = [
   "Mem-cho - Cheerful Explorer",        // bg1.jpg
-  "Mem-cho - Summer Garden Dreams",     // bg2.jpg  
+  "Mem-cho - Summer Garden Dreams",     // bg2.jpg
   "Kana, Akane & Mem-cho - Portrait Trio", // bg3.jpg
   "B-Komachi - Sweet Valentine",        // bg4.jpg
   "B-Komachi - Dark Performance",       // bg5.jpg
@@ -16,7 +16,7 @@ const imageNames = [
   "Mem-cho - Casual Style",             // bg9.jpg
   "B-Komachi - Traditional Kimono",     // bg10.jpg
   "B-Komachi - Christmas Performance",  // bg11.jpg
-  "B-Komachi - Stage Debut",            // bg12.jpg  
+  "B-Komachi - Stage Debut",            // bg12.jpg
   "B-Komachi - Unity Photo",            // bg13.jpg
   "B-Komachi - Concert Lights",         // bg14.jpg
   "B-Komachi - Stage Energy",           // bg15.jpg
@@ -24,18 +24,38 @@ const imageNames = [
   "Mem-cho - Contemplative Moment",        // bg17.jpg
   "B-Komachi - Live Performance",       // bg18.jpg
   "B-Komachi - Final Stage",            // bg19.jpg
+  "New Background",                     // bg20.jpg
 ];
 
 let currentIndex = 0;
 let rotationInterval;
 let currentLayer = 1; // Track which background layer is active
 let currentSong = null; // Track currently playing song
-let songQueue = []; // Queue of songs
+let songQueue = []; // Queue of { index, version }
 let currentSongIndex = 0; // Index in queue
 let currentSpeed = 5; // Current rotation speed in seconds
 let lastVolume = 50; // Store last volume before mute
 let uiHidden = false; // UI visibility state
 let pauseMusicOnTabHidden = true; // Pause music when tab hidden
+let currentSongCount = 10; // Number of songs available for current version
+let currentVersion = 'piano'; // Current selected version
+let currentPlayingVersion = 'piano'; // Version of currently playing song
+let playHistory = []; // History of played songs for backtracking
+let isBacktracking = false; // Flag to prevent adding to history when backtracking
+
+// Function to update song select options
+function updateSongSelect() {
+  songSelect.innerHTML = '';
+  for (let i = 0; i < currentSongCount; i++) {
+    const option = document.createElement('option');
+    option.value = i;
+    let suffix = '';
+    if (currentVersion === 'piano') suffix = ' (Piano)';
+    else if (currentVersion === 'instrumental') suffix = ' (Instrumental)';
+    option.textContent = songInfo[i].name + suffix;
+    songSelect.appendChild(option);
+  }
+}
 
 // Notification function
 function showNotification(message) {
@@ -49,6 +69,13 @@ function showNotification(message) {
   }
 }
 
+// Format time in mm:ss
+function formatTime(seconds) {
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+  return `${min}:${sec.toString().padStart(2, '0')}`;
+}
+
 // Update queue display
 function updateQueueDisplay() {
   const queueDiv = document.getElementById('queueDisplay');
@@ -56,14 +83,14 @@ function updateQueueDisplay() {
   if (songQueue.length === 0) {
     queueDiv.innerHTML = '<p style="margin: 0; color: #cc5580;">No songs in queue</p>';
   } else {
-    songQueue.forEach((song, index) => {
+    songQueue.forEach((item, index) => {
       const itemDiv = document.createElement('div');
       itemDiv.style.display = 'flex';
       itemDiv.style.alignItems = 'center';
       itemDiv.style.marginBottom = '5px';
 
       const text = document.createElement('span');
-      text.textContent = `${index + 1}. ${song.name}`;
+      text.textContent = `${index + 1}. ${songInfo[item.index].name} (${item.version})`;
       text.style.flex = '1';
       text.style.color = '#333';
       itemDiv.appendChild(text);
@@ -127,17 +154,20 @@ function updateQueueDisplay() {
 
 // Song information
 const songInfo = [
-  { name: "POP IN 2 Piano ver - B-Komachi", file: "Song1.mp3", element: null },
-  { name: "SIGN IS B Piano ver - B-Komachi", file: "song2.mp3", element: null },
-  { name: "IDOL Piano ver - YOASOBI", file: "song3.mp3", element: null },
-  { name: "STAR☆T☆RAIN Piano ver - B-Komachi", file: "song4.mp3", element: null },
-  { name: "HEART's♡KISS Piano ver - B-Komachi", file: "song5.mp3", element: null },
-  { name: "Mephisto Piano ver - QUEEN BEE", file: "song6.mp3", element: null },
-  { name: "FATAL - GEMN", file: "song7.mp3", element: null },
-  { name: "Burning - Hitsujibungaku", file: "song8.mp3", element: null },
-  { name: "FULL MOON...! - Kana Arima", file: "song9.mp3", element: null },
-  { name: "GREEN PEPPER CALISTHENICS - Kana Arima", file: "song10.mp3", element: null }
+  { name: "POP IN 2 - B-Komachi", files: { piano: "Piano/song1P.mp3", normal: "Normal/song1.mp3", instrumental: "Instrumental/song1I.mp3" }, file: "Piano/song1P.mp3", element: null },
+  { name: "SIGN IS B - B-Komachi", files: { piano: "Piano/song2P.mp3", normal: "Normal/song2.mp3", instrumental: "Instrumental/song2I.mp3" }, file: "Piano/song2P.mp3", element: null },
+  { name: "IDOL - YOASOBI", files: { piano: "Piano/song3P.mp3", normal: "Normal/song3.mp3", instrumental: "Instrumental/song3I.mp3" }, file: "Piano/song3P.mp3", element: null },
+  { name: "STAR☆T☆RAIN - B-Komachi", files: { piano: "Piano/song4P.mp3", normal: "Normal/song4.mp3", instrumental: "Instrumental/song4I.mp3" }, file: "Piano/song4P.mp3", element: null },
+  { name: "HEART's♡KISS - B-Komachi", files: { piano: "Piano/song5P.mp3", normal: "Normal/song5.mp3", instrumental: "Instrumental/song5I.mp3" }, file: "Piano/song5P.mp3", element: null },
+  { name: "Mephisto - QUEEN BEE", files: { piano: "Piano/song6P.mp3", normal: "Normal/song6.mp3", instrumental: "Instrumental/song6I.mp3" }, file: "Piano/song6P.mp3", element: null },
+  { name: "FATAL - GEMN", files: { piano: "Piano/song7P.mp3", normal: "Normal/song7.mp3", instrumental: "Instrumental/song7I.mp3" }, file: "Piano/song7P.mp3", element: null },
+  { name: "Burning - Hitsujibungaku", files: { piano: "Piano/song8P.mp3", normal: "Normal/song8.mp3", instrumental: "Instrumental/song8I.mp3" }, file: "Piano/song8P.mp3", element: null },
+  { name: "FULL MOON...! - Kana Arima", files: { piano: "Piano/song9P.mp3", normal: "Normal/song9.mp3", instrumental: "Instrumental/song9I.mp3" }, file: "Piano/song9P.mp3", element: null },
+  { name: "GREEN PEPPER CALISTHENICS - Kana Arima", files: { piano: "Piano/song10P.mp3", normal: "Normal/song10.mp3", instrumental: "Instrumental/song10I.mp3" }, file: "Piano/song10P.mp3", element: null },
+  { name: "Say What? - B Komachi", files: { piano: "Piano/song11P.mp3", normal: "Normal/song11.mp3", instrumental: "Instrumental/song11I.mp3" }, file: "Piano/song11P.mp3", element: null },
+  { name: "Deep Sea 52Hz", files: { piano: "Piano/song12P.mp3", normal: "Normal/song12.mp3", instrumental: "Instrumental/song12I.mp3" }, file: "Piano/song12P.mp3", element: null }
 ];
+
 
 // Change background image to next in sequence
 function changeBackgroundSequential() {
@@ -265,10 +295,15 @@ async function init() {
   songInfo.forEach((song, index) => {
     const audioEl = document.getElementById(`song${index + 1}`);
     if (audioEl) {
+      song.element = audioEl;
+      song.file = song.files.piano; // Default to piano version
       audioEl.src = song.file;
       audioEl.load();
     }
   });
+
+  // Populate song select
+  updateSongSelect();
   showNotification('📱 Using local content');
 
   // Load saved index
@@ -559,6 +594,10 @@ window.addEventListener('load', () => {
   const playPauseBtn = document.getElementById('playPauseBtn');
   const nextBtn = document.getElementById('nextBtn');
   const volumeSlider = document.getElementById('volumeSlider');
+  const volumePercentEl = document.getElementById('volumePercent');
+  const progressBar = document.getElementById('progressBar');
+  const currentTimeEl = document.getElementById('currentTime');
+  const durationEl = document.getElementById('duration');
   const song1Audio = document.getElementById('song1');
   const song2Audio = document.getElementById('song2');
   const currentSongDisplay = document.getElementById('currentSong');
@@ -576,6 +615,21 @@ window.addEventListener('load', () => {
       audioEl.load();
     }
   });
+
+  // Progress bar control
+  if (progressBar) {
+    progressBar.addEventListener('input', () => {
+      if (currentSong && currentSong.duration) {
+        const time = (progressBar.value / 100) * currentSong.duration;
+        currentSong.currentTime = time;
+      }
+    });
+  }
+
+  // Initial volume percentage
+  if (volumePercentEl) {
+    volumePercentEl.textContent = volumeSlider.value + '%';
+  }
 
   // Check for missing elements
   if (!song1Audio) {
@@ -781,8 +835,10 @@ window.addEventListener('load', () => {
     const t = translations[lang] || translations['en-US'];
     if (currentSong) {
       const currentSongInfo = songInfo[currentSongIndex];
-      const parts = currentSongInfo.name.split(' - ');
-      const songText = `${t.songPrefix}${currentSongInfo.name}`;
+      let suffix = '';
+      if (currentPlayingVersion === 'piano') suffix = ' (Piano)';
+      else if (currentPlayingVersion === 'instrumental') suffix = ' (Instrumental)';
+      const songText = `${t.songPrefix}${currentSongInfo.name}${suffix}`;
       if (currentSongDisplay) {
         currentSongDisplay.innerHTML = songText;
         currentSongDisplay.classList.add('playing');
@@ -809,10 +865,6 @@ window.addEventListener('load', () => {
       stopAllMusic();
 
       songToPlay.element.volume = volumeSlider.value / 100;
-      // Skip first 4 seconds for songs 4, 8, 9, 10 (indices 3, 7, 8, 9)
-      if ([3, 7, 8, 9].includes(currentSongIndex)) {
-        songToPlay.element.currentTime = 4;
-      }
 
       const tryPlay = () => {
         songToPlay.element.play().catch(error => {
@@ -833,6 +885,25 @@ window.addEventListener('load', () => {
       tryPlay();
 
       currentSong = songToPlay.element;
+
+      // Add to play history if not backtracking
+      if (!isBacktracking && (playHistory.length === 0 || playHistory[playHistory.length - 1] !== currentSongIndex)) {
+        playHistory.push(currentSongIndex);
+      }
+      isBacktracking = false; // Reset flag
+
+      // Add progress bar listeners
+      currentSong.addEventListener('loadedmetadata', () => {
+        durationEl.textContent = formatTime(currentSong.duration);
+      });
+      currentSong.addEventListener('timeupdate', () => {
+        if (currentSong.duration) {
+          const progress = (currentSong.currentTime / currentSong.duration) * 100;
+          progressBar.value = progress;
+          currentTimeEl.textContent = formatTime(currentSong.currentTime);
+        }
+      });
+
       updateCurrentSongDisplay();
       playPauseBtn.textContent = '⏸';
     }
@@ -849,44 +920,76 @@ window.addEventListener('load', () => {
     currentSong = null;
     updateCurrentSongDisplay();
     playPauseBtn.textContent = '▶';
+    // Reset progress bar
+    progressBar.value = 0;
+    currentTimeEl.textContent = '0:00';
+    durationEl.textContent = '0:00';
   }
 
   // Music button event listeners
   prevBtn.addEventListener('click', () => {
-    currentSongIndex = (currentSongIndex - 1 + songInfo.length) % songInfo.length;
-    playCurrentSong();
+    if (playHistory.length > 1) {
+      currentSongIndex = playHistory[playHistory.length - 2]; // get second last
+      currentPlayingVersion = currentVersion;
+      isBacktracking = true;
+      playCurrentSong();
+    } else {
+      currentSongIndex = (currentSongIndex - 1 + currentSongCount) % currentSongCount;
+      currentPlayingVersion = currentVersion;
+      playCurrentSong();
+    }
   });
 
   playPauseBtn.addEventListener('click', () => {
     if (currentSong && !currentSong.paused) {
       currentSong.pause();
       playPauseBtn.textContent = '▶';
+    } else if (currentSong && currentSong.paused) {
+      // Unpause current song
+      currentSong.play();
+      playPauseBtn.textContent = '⏸';
+      updateCurrentSongDisplay();
     } else {
-      if (!currentSong && songQueue.length > 0) {
-        // If no song playing and queue exists, play first in queue
-        const nextSong = songQueue.shift();
-        currentSongIndex = songInfo.findIndex(s => s.file === nextSong.file);
+      // No current song, start new
+      if (songQueue.length > 0) {
+        // If queue exists, play first in queue
+        const nextItem = songQueue.shift();
+        currentSongIndex = nextItem.index;
+        currentPlayingVersion = nextItem.version;
+        // Set the file to the queued version
+        const song = songInfo[nextItem.index];
+        song.file = song.files[nextItem.version];
+        song.element.src = song.file;
+        song.element.load();
         // Update queue display if visible
         const queueDiv = document.getElementById('queueDisplay');
         if (queueDiv && queueDiv.style.display !== 'none') {
           updateQueueDisplay();
         }
       }
+      currentPlayingVersion = currentVersion;
       playCurrentSong();
     }
   });
 
   nextBtn.addEventListener('click', () => {
     if (songQueue.length > 0) {
-      const nextSong = songQueue.shift();
-      currentSongIndex = songInfo.findIndex(s => s.file === nextSong.file);
+      const nextItem = songQueue.shift();
+      currentSongIndex = nextItem.index;
+      currentPlayingVersion = nextItem.version;
+      // Set the file to the queued version
+      const song = songInfo[nextItem.index];
+      song.file = song.files[nextItem.version];
+      song.element.src = song.file;
+      song.element.load();
       // Update queue display if visible
       const queueDiv = document.getElementById('queueDisplay');
       if (queueDiv && queueDiv.style.display !== 'none') {
         updateQueueDisplay();
       }
     } else {
-      currentSongIndex = (currentSongIndex + 1) % songInfo.length;
+      currentSongIndex = (currentSongIndex + 1) % currentSongCount;
+      currentPlayingVersion = currentVersion;
     }
     playCurrentSong();
   });
@@ -904,6 +1007,8 @@ window.addEventListener('load', () => {
     if (speakerIcon) {
       speakerIcon.src = volume === 0 ? `Speakermuted.svg` : `Speaker.svg`;
     }
+    // Update volume percentage
+    volumePercentEl.textContent = volumeSlider.value + '%';
   });
 
   // Speaker icon click to toggle mute
@@ -934,8 +1039,23 @@ window.addEventListener('load', () => {
   // Song version change
   if (songVersion) {
     songVersion.addEventListener('change', () => {
-      // Could filter songs based on version, but for now just log
-      console.log('Song version changed to:', songVersion.value);
+      const version = songVersion.value;
+      currentVersion = version;
+      currentSongCount = (version === 'piano') ? 10 : 12;
+  
+      songInfo.forEach((song, index) => {
+        if (song.element && song.element !== currentSong) {
+          const newSrc = song.files[version];
+          song.file = newSrc;
+          song.element.src = newSrc;
+          song.element.load();
+        }
+      });
+  
+      // Update song selector options
+      updateSongSelect();
+  
+      console.log('Song version changed to:', version, 'songs:', currentSongCount);
     });
   }
 
@@ -944,9 +1064,10 @@ window.addEventListener('load', () => {
     addToQueueBtn.addEventListener('click', () => {
       const selectedIndex = parseInt(songSelect.value);
       if (!isNaN(selectedIndex) && songInfo[selectedIndex]) {
-        if (!songQueue.some(song => song.file === songInfo[selectedIndex].file)) {
-          songQueue.push(songInfo[selectedIndex]);
-          showNotification('Added to queue: ' + songInfo[selectedIndex].name);
+        const currentVersion = songVersion.value;
+        if (!songQueue.some(item => item.index === selectedIndex && item.version === currentVersion)) {
+          songQueue.push({ index: selectedIndex, version: currentVersion });
+          showNotification('Added to queue: ' + songInfo[selectedIndex].name + ' (' + currentVersion + ')');
           // Update queue display if visible
           const queueDiv = document.getElementById('queueDisplay');
           if (queueDiv && queueDiv.style.display !== 'none') {
@@ -979,15 +1100,22 @@ window.addEventListener('load', () => {
       song.element.addEventListener('ended', () => {
         if (currentSong === song.element) {
           if (songQueue.length > 0) {
-            const nextSong = songQueue.shift();
-            currentSongIndex = songInfo.findIndex(s => s.file === nextSong.file);
+            const nextItem = songQueue.shift();
+            currentSongIndex = nextItem.index;
+            currentPlayingVersion = nextItem.version;
+            // Set the file to the queued version
+            const nextSong = songInfo[nextItem.index];
+            nextSong.file = nextSong.files[nextItem.version];
+            nextSong.element.src = nextSong.file;
+            nextSong.element.load();
             // Update queue display if visible
             const queueDiv = document.getElementById('queueDisplay');
             if (queueDiv && queueDiv.style.display !== 'none') {
               updateQueueDisplay();
             }
           } else {
-            currentSongIndex = (currentSongIndex + 1) % songInfo.length;
+            currentSongIndex = (currentSongIndex + 1) % currentSongCount;
+            currentPlayingVersion = currentVersion;
           }
           playCurrentSong();
         }
